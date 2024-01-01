@@ -11,6 +11,7 @@ use tokio::task;
 use std::fs::File;
 use std::thread;
 use std::io::{self, BufRead};
+use serde::de::DeserializeOwned;
 static HEADING: &str = "../";
 
 // use std::io::prelude::*;
@@ -38,22 +39,26 @@ async fn search(query: &str) -> String {
 
     // fs::write(embeddings_file_path, serialized_embeddings).await.unwrap(); 
     // fs::write(file_names_file_path, serialized_file_names).await.unwrap();
-    let file_names = load_file_names(&file_names_file_path.to_string()).await;
-    format!("{} {}", query, file_names[10])
+    let file_names: Vec<String> = load_bincode(&file_names_file_path.to_string()).await;
+    let embeddings: Vec<f32> = load_bincode(&embeddings_file_path.to_string()).await;
+    format!("{} {}", query, file_names[20])
     
 }
 
-async fn load_file_names(file_names_file_path: &String) -> Vec<String> {
-
-    let file_names_bincode = fs::read(file_names_file_path).await.expect("Error reading file names");
-    match deserialize::<Vec<String>>(&file_names_bincode) {
-        Ok(file_names) => file_names,
+async fn load_bincode<T>(path: &String) -> Vec<T>
+where
+    T: DeserializeOwned,
+{
+    let data = fs::read(path).await.expect("Error reading bincode file");
+    match deserialize::<Vec<T>>(&data) {
+        Ok(data) => data,
         Err(e) => {
             eprintln!("Error deserializing data: {}", e);
-            Vec::new()
+            Default::default()
         }
     }
 }
+
 
 fn get_file_names(root_folder: &str) -> Vec<String> {
     // Read exclusions and endings
