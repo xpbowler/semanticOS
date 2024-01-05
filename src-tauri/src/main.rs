@@ -3,48 +3,79 @@
 
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![allow(unused_imports)]
 use serde::Serialize;
-//use tauri::api::file;
 use walkdir::WalkDir;
 use tokio::fs;
 use tokio::task;
 use std::fs::File;
 use std::thread;
+use std::convert::TryInto;
 use std::io::{self, BufRead};
 use serde::de::DeserializeOwned;
-static HEADING: &str = "../";
+use kiddo::KdTree;
+use kiddo::SquaredEuclidean;
+use kiddo::NearestNeighbour;    
+use bincode::{serialize, deserialize};
+use rust_bert::pipelines::sentence_embeddings::{SentenceEmbeddingsBuilder, SentenceEmbeddingsModelType};
 
+//use tauri::api::file;
 // use std::io::prelude::*;
 // use reqwest;
 // use walkdir::DirEntry;
-use bincode::{serialize, deserialize};
 //use bincode::Error;
-
-use rust_bert::pipelines::sentence_embeddings::{SentenceEmbeddingsBuilder, SentenceEmbeddingsModelType};
+static HEADING: &str = "../";
+static FILE_NAMES_PATH: &str = "./data/file_names.bincode";
+static EMBEDDINGS_PATH: &str = "./data/embeddings.bincode";
 
 #[tokio::main]
 #[tauri::command]
+//search for query given that the embeddings and file names are already saved to file
 async fn search(query: &str) -> String {
-    //obtain search result here
-    //let file_names = get_file_names(HEADING);
-    // let embedding_model = task::spawn_blocking(move || { SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL12V2).create_model().unwrap()})
-    // .await.expect("Error creating embedding model");
-    // let embeddings = embedding_model.encode(&file_names).expect("Error encoding embeddings");
-    // // save embeddings and file names to file
-    // let serialized_embeddings = serialize(&embeddings).unwrap();
-    // let serialized_file_names = serialize(&file_names).unwrap();
 
-    let embeddings_file_path = "./data/embeddings.bincode";
-    let file_names_file_path = "./data/file_names.bincode";
+    let embedding_model = task::spawn_blocking(move || { SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL12V2).create_model().unwrap()})
+    .await.expect("Error creating embedding model");
 
-    // fs::write(embeddings_file_path, serialized_embeddings).await.unwrap(); 
-    // fs::write(file_names_file_path, serialized_file_names).await.unwrap();
-    let file_names: Vec<String> = load_bincode(&file_names_file_path.to_string()).await;
-    let embeddings: Vec<f32> = load_bincode(&embeddings_file_path.to_string()).await;
-    format!("{} {}", query, file_names[20])
-    
+    //load embeddings and file names from bincode
+    let file_names: Vec<String> = load_bincode(&FILE_NAMES_PATH.to_string()).await;
+    let embeddings: Vec<Vec<f32>> = load_bincode(&EMBEDDINGS_PATH.to_string()).await;
+
+    //encode query
+    let query_embedding = embedding_model.encode(&[&query.to_string()]).expect("Error encoding query");
+    let query_vec: Result<[f32;384], _> = query_embedding[0].clone().try_into();
+
+    //initialize kdtree
+    let mut kdtree: KdTree<f32, 384> = KdTree::new();
+    for i in 0..embeddings.len() {
+        let vec: Result<[f32;384], _> = embeddings[i].clone().try_into();
+        kdtree.add(&vec.unwrap(), i as u64);
+    }
+
+    //search for nearest neighbor
+    let nearest_neighbor = kdtree.nearest_one::<SquaredEuclidean>(&query_vec.unwrap());
+    let res = file_names[nearest_neighbor.item as usize].clone();
+
+    //return nearest neighbor
+    format!("{}", res)
 }
 
+//create the embeddings and file names under HEADING directory and save to file
+async fn initialize(){
+    let embedding_model = task::spawn_blocking(move || { SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL12V2).create_model().unwrap()})
+    .await.expect("Error creating embedding model");
+
+    //create file paths and embeddings
+    let file_names = get_file_names(HEADING);
+    let embeddings = embedding_model.encode(&file_names).expect("Error encoding embeddings");
+    
+    // serialize and save embeddings and file names to bincode file
+    let serialized_embeddings = serialize(&embeddings).unwrap();
+    let serialized_file_names = serialize(&file_names).unwrap();
+    fs::write(EMBEDDINGS_PATH, serialized_embeddings).await.unwrap(); 
+    fs::write(FILE_NAMES_PATH, serialized_file_names).await.unwrap();
+}
+
+//load data from bincode file. Must be a deserializable vector of type T
 async fn load_bincode<T>(path: &String) -> Vec<T>
 where
     T: DeserializeOwned,
@@ -59,7 +90,7 @@ where
     }
 }
 
-
+//Obtain all file names in the directory
 fn get_file_names(root_folder: &str) -> Vec<String> {
     // Read exclusions and endings
     let mut endings: Vec<String> = Vec::new();
@@ -75,13 +106,15 @@ fn get_file_names(root_folder: &str) -> Vec<String> {
             file_names.push(entry.path().display().to_string());
         }
     }
+    // Remove the heading
     for file_name in &mut file_names {
-        *file_name = file_name.replace(HEADING, "");
+        *file_name = file_name.replace(HEADING, "")
     }
-    // let embeddings = embedding_model.encode(&file_names)?;
+
     file_names
 }
 
+//Read lines from a file into a vector
 fn read_lines(path: &str, vec: &mut Vec<String>) -> io::Result<()> {
     let file = File::open(path)?;
     let reader = io::BufReader::new(file);
@@ -91,6 +124,7 @@ fn read_lines(path: &str, vec: &mut Vec<String>) -> io::Result<()> {
     Ok(())
 }
 
+//Check if a file path is valid. Meets requirements of endings and not in excluded folders
 fn is_valid_file(path: &String, endings: &Vec<String>, excluded_folders: &Vec<String>) -> bool {
     // ... logic to check if a file is valid based on endings and excluded folders
     for excluded_folder in excluded_folders.iter() {
@@ -101,10 +135,6 @@ fn is_valid_file(path: &String, endings: &Vec<String>, excluded_folders: &Vec<St
     }
     return false;
 }
-
-// async fn search_for_query(query: &str) {
-//     //similarity search
-// }
 
 fn main() {
     tauri::Builder::default()

@@ -14,7 +14,7 @@ def get_file_names(root_folder):
     endings = []
     for ending in open('./data/endings.txt', 'r'): endings.append('.' + ending.strip())
     excluded_folders = []
-    for folder in open('./data/excluded_folders.txt', 'r'): excluded_folders.append('.' + folder.strip())
+    for folder in open('./data/excluded_folders.txt', 'r'): excluded_folders.append(folder.strip())
 
     file_names = []
     for root, dirs, files in os.walk(root_folder):
