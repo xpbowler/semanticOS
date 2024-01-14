@@ -6,22 +6,20 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "semanticOS",
+    "productName": "semantic-OS",
     "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
-      "shell": {
-        "all": false,
-        "open": true
+      "fs": {
+        "all": true,
+        "scope": ["$DOWNLOAD/*", "$DESKTOP/*"]
       },
-      "dialog": {
-        "all": true, 
-        "ask": true,
-        "confirm": true, 
-        "message": true,
-        "open": true, 
-        "save": true 
+      "shell": {
+        "all": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
@@ -43,7 +41,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "semanticos",
+        "title": "semantic-os",
         "width": 800,
         "height": 600
       }

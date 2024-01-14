@@ -1,5 +1,5 @@
 {
-  "name": "semanticos",
+  "name": "semantic-os",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,7 +15,7 @@
     "@tauri-apps/api": "^1.5.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.3",
+    "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.0.0",
     "@tauri-apps/cli": "^1.5.8"
   }

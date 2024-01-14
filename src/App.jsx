@@ -2,18 +2,21 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import {writeTextFile, BaseDirectory} from '@tauri-apps/api/fs';
+import {downloadDir, desktopDir} from '@tauri-apps/api/path';
+import {open} from '@tauri-apps/api/shell';
 
 function App() {
   const [searchResult, setSearchResult] = useState("");
   const [x, setX] = useState("hmm");
   const [query, setQuery] = useState("");
-  const folderPath = "C:\\Users\\rnqua\\Files\\Projects\\semanticOS\\src-tauri";
 
   async function search() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    const path = await desktopDir();
     setSearchResult(await invoke("search", { query }));
-    await invoke("open", { uri: "file://${folderPath}" })
-
+    //await open(path);
+    //setX(path);
+    //await writeTextFile('example.txt', 'Hello world!\n', { dir: BaseDirectory.Download });
   }
 
   async function get_embeddings(){
