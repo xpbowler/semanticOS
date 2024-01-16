@@ -26,9 +26,8 @@ Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-Min
 ```
 Vector embeddings: ~30MB / 1M files. 
 Vector embedding model: 86.6MB
-RAM usage: ~2GB during search, 700MB while idle
+RAM usage: ~190MB during initialization, <70MB while searching/idle
 ```
-
 
 ## 🔨 Installation
 
