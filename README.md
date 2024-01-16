@@ -3,11 +3,12 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE.md)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xpbowler/semanticOS.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xpbowler/semanticOS)
-[![Build Status](https://github.com/xpbowler/semanticOS/workflows/Build/badge.svg?event=push)](https://github.com/xpbowler/semanticOS/actions)
 
 SemanticOS is a lightweight desktop application, built in Rust and packaged by Tauri, for fast semantic file searching. It employs local vector embedding generation (BERT) and a K-dimensional Tree vector searching algorithm O(logn).
 
 It features a file-name generator using a small scale transformer architecture, implementing multi-headed self attention with a bigram language model trained in PyTorch and ported to Rust.
+
+Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model from Hugging Face and [Embed-V3](https://txt.cohere.com/introducing-embed-v3/) model from Cohere are used for embedding generation. The embeddings and metadata are stored in binary using serialization / deserialization from [Rust Serde](https://serde.rs/)
 
 ## Benchmarks 
 
@@ -23,7 +24,7 @@ It features a file-name generator using a small scale transformer architecture, 
 
 #### Disk,RAM space usage:
 ```
-Vector embeddings: ~30MB / 1M files
+Vector embeddings: ~30MB / 1M files. 
 Vector embedding model: 86.6MB
 RAM usage: ~2GB during search, 700MB while idle
 ```
