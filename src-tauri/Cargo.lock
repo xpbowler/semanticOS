@@ -830,8 +830,12 @@ dependencies = [
 name = "functions"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "lopdf",
+ "ndarray",
+ "ort",
  "reqwest",
+ "rust_tokenizers",
  "serde",
  "serde-pickle",
  "serde_json",
@@ -2930,15 +2934,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "semantic-os"
+name = "semantic_os"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "bincode",
  "functions",
  "instant-distance",
  "kiddo",
- "ndarray",
  "ort",
  "reqwest",
  "rust_tokenizers",

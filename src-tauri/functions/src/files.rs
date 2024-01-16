@@ -8,9 +8,9 @@ use lopdf::Document;
 pub fn get_file_names(root_folder: &str) -> Vec<String> {
     // Read exclusions and endings
     let mut endings: Vec<String> = Vec::new();
-    read_lines("./data/endings.txt", &mut endings).expect("Error reading endings");
+    read_lines("./data/filters/endings.txt", &mut endings).expect("Error reading endings");
     let mut excluded_folders: Vec<String> = Vec::new();
-    read_lines("./data/excluded_folders.txt", &mut excluded_folders).expect("Error reading excluded folders");
+    read_lines("./data/filters/excluded_folders.txt", &mut excluded_folders).expect("Error reading excluded folders");
 
     // Walk the directory
     let mut file_names = Vec::new();

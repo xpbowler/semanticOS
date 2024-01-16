@@ -1,4 +1,0 @@
-https://github.com/rust-cv/hnsw  -- Rust hnsw
-https://github.com/cpcdoy/rust-sbert -- Rust sentence_transformers
-https://developers.notion.com/reference/intro -- Notion API
-https://github.com/generall/cat_hnswlib -- General information about hnsw
