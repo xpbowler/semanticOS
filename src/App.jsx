@@ -11,15 +11,15 @@ function App() {
   const [query, setQuery] = useState("");
 
   async function search() {
-    const path = await desktopDir();
-    setSearchResult(await invoke("search", { query }));
-    //await open(path);
-    //setX(path);
-    //await writeTextFile('example.txt', 'Hello world!\n', { dir: BaseDirectory.Download });
+    let sub_dir = await invoke("search",{query});
+    let absolute_path = await invoke("get_absolute_path");
+    let path = absolute_path + sub_dir;
+    setSearchResult(path);
+    await open(searchResult);
   }
 
   async function get_embeddings(){
-    setX(await invoke("initialize"));
+    setX(await invoke("initialized"));
   }
 
   return (

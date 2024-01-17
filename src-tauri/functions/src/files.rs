@@ -57,7 +57,7 @@ pub fn get_file_contents(file_names: &Vec<String>) -> (HashMap<&String, i32>, Ve
         let mut count = 0;
         let mut content: Vec<String> = Vec::new();
         if file_name.ends_with(".pdf") {(content,count) = parse_pdf(file_name)};
-        // if file_name.ends_with(".txt") {content; count = parse_txt(file_name)};
+        if file_name.ends_with(".txt") {(content, count) = parse_txt(file_name)};
         // if file_name.ends_with(".docx") {content; count = parse_docx(file_name)};
         file_contents.append(&mut content);
         content_lengths.insert(file_name, count);
@@ -65,23 +65,23 @@ pub fn get_file_contents(file_names: &Vec<String>) -> (HashMap<&String, i32>, Ve
     (content_lengths, file_contents)
 }
 
-// fn parse_txt(file_name: &String) -> (Vec<String>, i32){
-//     let mut count = 0;
-//     let mut content = Vec::new();
-//     let file = File::open(file_name);
-//     let reader = BufReader::new(file);
-//     for line in reader.lines(){
-//         match line{
-//             Ok(line) => {
-//                 content.push(line);
-//                 count+=1;
-//             }
-//             Err(err) => {
-//                 eprintln!("{err}");
-//             }
-//         }
-//     }
-// }
+fn parse_txt(file_name: &String) -> (Vec<String>, i32){
+    let mut res: Vec<String> = Vec::new();
+    read_lines(file_name.as_str(), &mut res).expect("Error reading txt file at: {file_name}");
+
+    //truncate each string to 10 words limit
+    for str in res.iter_mut() {
+        *str = str.split_whitespace()  
+                 .take(10)            // Take the first 10 words
+                 .collect::<Vec<&str>>() // Collect words into a vector
+                 .join(" ");          
+    }
+    let count: i32 = res.len() as i32;
+    if count > 10 {
+        res.truncate(10);
+    }
+    (res, count)
+}
 
 // fn parse_docx(file_name: &String) -> (Vec<String>, i32){
 
@@ -90,7 +90,11 @@ pub fn get_file_contents(file_names: &Vec<String>) -> (HashMap<&String, i32>, Ve
 fn parse_pdf(file_name: &String) -> (Vec<String>, i32){
     let mut count = 0;
     let mut content = Vec::new();
+
+    //load the pdf document
     let doc = Document::load(file_name);
+
+    //parse the pdf document
     match doc{
         Ok(document) => {
             let pages = document.get_pages();
@@ -106,6 +110,7 @@ fn parse_pdf(file_name: &String) -> (Vec<String>, i32){
             eprintln!("{err}");
         }
     }
+
     (content,count)
 }
 

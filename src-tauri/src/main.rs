@@ -1,17 +1,20 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use functions::{files, model};
-use std::{collections::HashMap, convert::TryInto, sync::Arc};
+use std::{collections::HashMap, convert::TryInto, sync::Arc, path::Path};
 use kiddo::{KdTree, SquaredEuclidean};
 use bincode::serialize;
 use ort::{Environment,SessionBuilder};
 use rust_tokenizers::tokenizer::BertTokenizer;
 use tokio::fs;
+use path_absolutize::*;
+
 
 const MODEL_PATH: &str = "./data/embedding-model/all-MiniLM-L6-v2.onnx";
 const VOCAB_PATH: &str = "./data/embedding-model/vocab.txt";
 const SPECIAL_TOKEN_PATH: &str = "./data/embedding-model/special_tokens_map.json";
-static HEADING: &str = ".././"; //tauri is called from src-tauri directory, so "../ represents semanticOS directory"
+//tauri is called from src-tauri directory. ../ represents semanticOS directory ../../ represents parent directory of semanticOS
+static HEADING: &str = "../../"; 
 static FILE_NAMES_PATH: &str = "./data/vectors-metadata/file_names.bin";
 static EMBEDDINGS_PATH: &str = "./data/vectors-metadata/embeddings.bin";
 static CONTENT_EMBEDDINGS_PATH: &str = "./data/vectors-metadata/content_embeddings.bin";
@@ -64,8 +67,6 @@ async fn search(query: &str) -> String {
     }
 
     res = res.replace(HEADING, "");
-    res = res.replace("\\", " ");
-
     //return nearest neighbor
     format!("{res}")
 }
@@ -106,10 +107,20 @@ async fn initialize() -> String{
     format!("Initialized")
 }
 
+#[tauri::command]
+async fn get_absolute_path() -> String{
+    let p = Path::new("");
+    let absolute_path = p.absolutize().unwrap();
+    let path_str = absolute_path.to_str().unwrap();
+    let mut absolute_path = path_str.to_string();
+    absolute_path = absolute_path.replace("semanticOS\\src-tauri", "");
+    format!("{}", absolute_path)
+}
+
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![search, initialize])
+        .invoke_handler(tauri::generate_handler![search, initialize, get_absolute_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
