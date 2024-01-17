@@ -54,11 +54,11 @@ Github file structure:
 ├── public # Frontend resources
 ├── src-tauri # Rust backend
 │   ├── data # Backend metadata
+│   │  ├── all-MiniLM-L6-V2.onnx #BERT vector embedding model ported to Rust
 │   ├── functions # Helper functions for search+embeddings
 │   ├── icons # Tauri resources
 │   ├── src # Main rust progam
 │   │  ├── Cargo.toml # Specification of cargo dependencies
-│   │  ├── all-MiniLM-L6-V2.onnx #BERT vector embedding model ported to Rust
 ├── index.html 
 ├── package.json # project frontend metadata
 ├── package-lock.json # project frontend dependencies
