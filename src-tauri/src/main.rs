@@ -11,7 +11,7 @@ use tokio::fs;
 const MODEL_PATH: &str = "./data/embedding-model/all-MiniLM-L6-v2.onnx";
 const VOCAB_PATH: &str = "./data/embedding-model/vocab.txt";
 const SPECIAL_TOKEN_PATH: &str = "./data/embedding-model/special_tokens_map.json";
-static HEADING: &str = "../"; //tauri is called from src-tauri directory, so "../ represents semanticOS directory"
+static HEADING: &str = ".././"; //tauri is called from src-tauri directory, so "../ represents semanticOS directory"
 static FILE_NAMES_PATH: &str = "./data/vectors-metadata/file_names.bin";
 static EMBEDDINGS_PATH: &str = "./data/vectors-metadata/embeddings.bin";
 static CONTENT_EMBEDDINGS_PATH: &str = "./data/vectors-metadata/content_embeddings.bin";
