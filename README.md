@@ -8,7 +8,9 @@ SemanticOS is a lightweight desktop application, built in Rust and packaged by T
 
 It features a file-name generator using a small scale transformer architecture, implementing multi-headed self attention with a bigram language model trained in PyTorch and ported to Rust.
 
-Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model from Hugging Face and [Embed-V3](https://txt.cohere.com/introducing-embed-v3/) model from Cohere are used for embedding generation. The embeddings and metadata are stored in binary using serialization / deserialization from [Rust Serde](https://serde.rs/)
+Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model from Hugging Face and [Embed-V3](https://txt.cohere.com/introducing-embed-v3/) model from Cohere are used for embedding generation. The embeddings and metadata are stored in binary using serialization / deserialization from [Rust Serde](https://serde.rs/). 
+
+When using SemanticOS, the search scope can be specified inside the application. The default search scope is the parent directory of the SemanticOS folder (```./```)
 
 ## Benchmarks 
 
@@ -42,7 +44,7 @@ Requirements :
 
 * Misc: Permission to access/edit files (Windows)
   
-File structure:
+Github file structure:
 
 ```bash
 .
