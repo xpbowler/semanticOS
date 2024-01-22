@@ -6,9 +6,16 @@
 
 SemanticOS is a lightweight desktop application, built in Rust and packaged by Tauri, for fast semantic file searching. It employs local vector embedding generation (BERT) and a K-dimensional Tree vector searching algorithm O(logn).
 
+Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model from Hugging Face and [Embed-V3](https://txt.cohere.com/introducing-embed-v3/) model from Cohere are used for embedding generation. The embeddings and metadata are stored in binary using serialization / deserialization from [Rust Serde](https://serde.rs/). 
+
+
+
 It features a file-name generator using a small scale transformer architecture, implementing multi-headed self attention with a bigram language model trained in PyTorch and ported to Rust.
 
-Both the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model from Hugging Face and [Embed-V3](https://txt.cohere.com/introducing-embed-v3/) model from Cohere are used for embedding generation. The embeddings and metadata are stored in binary using serialization / deserialization from [Rust Serde](https://serde.rs/). 
+Current implementation follows a few key papers:
+- Bigram Language Model
+- Transformers, following [Vaswani et al. 2017](https://arxiv.org/abs/1706.03762)
+- Residual Connections, following [He et al. 2015](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html)
 
 When using SemanticOS, the search scope can be specified inside the application. The default search scope is the parent directory of the SemanticOS folder (```./```)
 
