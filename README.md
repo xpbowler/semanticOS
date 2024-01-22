@@ -76,14 +76,14 @@ Github file structure:
 Instructions:
 
 1. Clone the repository (<100MB including vector embedding model)
-```
+```bash
 $ git clone https://github.com/xpbowler/semanticos
 ```
 2. Install required dependencies
-```
+```bash
 $ npm install
 ```
 4. Run desktop application. This step can take a while for the first build, as Rust is loading all the necessary crates.
-```
+```bash
 $ npm run tauri dev
 ```
